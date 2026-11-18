@@ -11,6 +11,8 @@ import java.math.*;
 import java.time.*;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,10 @@ public class OrderService {
   private final ActorService actorService;
   private final AuditService auditService;
   private final Environment environment;
+
+  private final WhatsAppClient whatsAppClient;
+  @Value("${whatsapp.manager.phone:}")
+  private String managerPhone;
 
   public OrderView view(PurchaseOrder purchaseOrder) {
     return new OrderView(
@@ -617,6 +623,19 @@ public class OrderService {
     }
 
     history(purchaseOrder, null, "NEW");
+
+    if (managerPhone != null && !managerPhone.isBlank()) {
+      String alertGestora =
+          String.format(
+              "Novo Pedido #%s recebido!\nCliente: %s (%s)\nTotal: R$ %s\nForma de Pagamento: %s",
+              purchaseOrder.getId(),
+              customer.getName(),
+              customer.getPhone(),
+              purchaseOrder.getTotal(),
+              purchaseOrder.getPaymentMethod());
+      whatsAppClient.send(managerPhone, alertGestora);
+    }
+
     return view(purchaseOrder);
   }
   
@@ -688,7 +707,7 @@ public class OrderService {
     OrderInput internalInput = new OrderInput(
         customer.getId().toString(),
         data.paymentMethod(),
-        data.installmentCount(),
+        data.installmentCount() != null ? data.installmentCount() : 1,
         data.delivery(),
         selectedAddress != null ? selectedAddress.getId().toString() : null,
         data.couponCode(),

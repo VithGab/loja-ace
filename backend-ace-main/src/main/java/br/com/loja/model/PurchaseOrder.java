@@ -75,4 +75,8 @@ public class PurchaseOrder extends BaseEntity {
 
   @Column(name = "customer_phone", nullable = false)
   private String customerPhone;
+
+  public boolean getDelivery() {
+    return delivery;
+  }
 }

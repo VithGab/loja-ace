@@ -45,7 +45,7 @@ public final class PublicCheckoutDtos {
         @NotBlank @Size(min =2, max = 255) String customerName,
         @NotBlank String customerPhone,
         LocalDate customerBirthDay,
-        @NotBlank @Pattern (regexp = "PIX|CASH|BOLETO|INSTALMENT") String paymentMethod,
+        @NotBlank @Pattern (regexp = "PIX|CASH|CARD|BOLETO|INSTALLMENTS") String paymentMethod,
         @Min (1) @Max (12) Integer installmentCount,
         boolean delivery,
         @PositiveIdentifier String addressId,

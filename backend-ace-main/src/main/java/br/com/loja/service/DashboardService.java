@@ -5,6 +5,8 @@ import br.com.loja.dto.DashboardDtos.*;
 import br.com.loja.exception.ApiException;
 import br.com.loja.model.Installment;
 import br.com.loja.repository.*;
+
+import java.math.BigDecimal;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -104,12 +106,13 @@ public class DashboardService {
     LocalDate end = requestedMonth.atEndOfMonth();
     var total = installmentRepository.sumAmountByStatusAndDueDateBetween(
         "PENDING", start, end);
+    BigDecimal totalPending = total != null ? total : BigDecimal.ZERO;
     var installmentsPage = installmentRepository.findByStatusAndDueDateBetween(
         "PENDING", start, end, CatalogService.page(page, size));
     return new ReceivablesView(
         month,
         year,
-        PricingCalculator.money(total),
+        PricingCalculator.money(total != null ? total : BigDecimal.ZERO),
         PageView.from(installmentsPage.map(this::view)));
   }
 

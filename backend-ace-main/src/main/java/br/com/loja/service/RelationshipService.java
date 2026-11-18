@@ -29,6 +29,8 @@ public class RelationshipService {
   private final ActorService actorService;
   private final AuditService auditService;
 
+  private final WhatsAppClient whatsAppClient;
+
   private BenefitView view(BirthdayBenefit birthdayBenefit) {
     return new BenefitView(
         birthdayBenefit.getId().toString(),
@@ -231,5 +233,31 @@ public class RelationshipService {
             + "?text="
             + URLEncoder.encode(message, StandardCharsets.UTF_8),
         false);
+  }
+
+  public BillingView sendBilling(String installmentId) {
+    var preview = preview(installmentId);
+    var installment = installmentRepository.findById(CatalogService.id(installmentId))
+        .orElseThrow(ApiException::missing);
+    boolean sent = whatsAppClient.send(installment.getOrder().getCustomer().getPhone(), preview.message());
+    var billingRecord = new BillingRecord();
+    billingRecord.setInstallment(installment);
+    billingRecord.setMessage(preview.message());
+    billingRecord.setDeclaredSentAt(Instant.now());
+    billingRecordRepository.save(billingRecord);
+    return new BillingView(
+        billingRecord.getId().toString(),
+        installment.getId().toString(),
+        billingRecord.getMessage(),
+        billingRecord.getDeclaredSentAt()
+    );
+  }
+
+  public boolean sendBirthdayMessage(String customerId) {
+    var customer = customerRepository.findById(CatalogService.id(customerId))
+        .orElseThrow(ApiException::missing);
+    var preview = birthdayPreview(customerId);
+
+    return whatsAppClient.send(customer.getPhone(), preview.message());
   }
 }

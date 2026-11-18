@@ -30,7 +30,7 @@ public interface InstallmentRepository extends JpaRepository<Installment, Long> 
   Page<Installment> findByStatusAndDueDateBetween(
       String status, LocalDate start, LocalDate end, Pageable page);
 
-  @Query("select coalesce(sum(i.amount), 0) from Installment i "
+  @Query("select sum(i.amount) from Installment i "
           + "where i.status = :status and i.dueDate between :start and :end")
   BigDecimal sumAmountByStatusAndDueDateBetween(
           @Param("status") String status,

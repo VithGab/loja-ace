@@ -44,4 +44,8 @@ public class Product extends BaseEntity {
 
   @Column(name = "active", nullable = false)
   private boolean active = true;
+
+  public boolean getActive() {
+    return active;
+  }
 }

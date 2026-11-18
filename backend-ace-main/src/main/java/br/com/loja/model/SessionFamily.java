@@ -30,4 +30,8 @@ public class SessionFamily {
 
   @Column(nullable = false)
   private boolean revoked;
+
+  public boolean getRevoked() {
+    return revoked;
+  }
 }

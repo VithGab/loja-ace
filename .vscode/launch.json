@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "BackendLojaApplication",
+      "request": "launch",
+      "mainClass": "br.com.loja.BackendLojaApplication",
+      "projectName": "backend-ace-main"
+    },
+    {
+      "type": "java",
+      "name": "BackendLojaApplication (dev)",
+      "request": "launch",
+      "mainClass": "br.com.loja.BackendLojaApplication",
+      "projectName": "backend-loja",
+      "args": "--spring.profiles.active=dev"
+    }
+  ]
+}

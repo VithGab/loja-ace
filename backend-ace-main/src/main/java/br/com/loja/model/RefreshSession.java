@@ -32,4 +32,8 @@ public class RefreshSession extends BaseEntity {
 
   @Column(name = "family_id", length = 36)
   private String familyId;
+
+  public boolean getRevoked() {
+    return revoked;
+  }
 }
