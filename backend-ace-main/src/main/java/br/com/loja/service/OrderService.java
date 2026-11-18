@@ -3,6 +3,7 @@ package br.com.loja.service;
 import br.com.loja.dto.CatalogDtos.PageView;
 import br.com.loja.dto.OrderDtos.*;
 import br.com.loja.dto.PublicCheckoutDtos;
+import br.com.loja.dto.SalesReportView;
 import br.com.loja.exception.ApiException;
 import br.com.loja.model.*;
 import br.com.loja.repository.*;
@@ -714,6 +715,31 @@ public class OrderService {
         data.items()
     );
 
-    return processOrder(customer, internalInput, rawKey, "CUSTOMER");  }
+    return processOrder(customer, internalInput, rawKey, "CUSTOMER");
+  }
+  public SalesReportView generateSalesReport(
+      LocalDate startDate, LocalDate endDate, String status, String paymentStatus) {
+
+    Instant startInstant = startDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+    Instant endInstant = endDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
+
+    List<PurchaseOrder> orders = purchaseOrderRepository.findForSalesReport(
+        startInstant, endInstant, status, paymentStatus);
+
+    long totalOrders = orders.size();
+    BigDecimal totalRevenue = orders.stream()
+        .map(PurchaseOrder::getTotal)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    BigDecimal averageTicket = totalOrders > 0
+        ? totalRevenue.divide(BigDecimal.valueOf(totalOrders), 2, RoundingMode.HALF_UP)
+        : BigDecimal.ZERO;
+    List<OrderView> orderViews = orders.stream()
+        .map(this::view)
+        .toList();
+
+    return new SalesReportView(
+        startDate, endDate, totalOrders, totalRevenue, averageTicket, orderViews);
+  }
+
 
 }

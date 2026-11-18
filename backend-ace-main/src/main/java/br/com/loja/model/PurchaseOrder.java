@@ -2,7 +2,6 @@ package br.com.loja.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.time.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

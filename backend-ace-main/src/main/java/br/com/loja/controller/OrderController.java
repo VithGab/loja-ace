@@ -2,10 +2,15 @@ package br.com.loja.controller;
 
 import br.com.loja.dto.CatalogDtos.PageView;
 import br.com.loja.dto.OrderDtos.*;
+import br.com.loja.dto.SalesReportView;
 import br.com.loja.service.OrderService;
 import jakarta.validation.Valid;
+
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -74,4 +79,13 @@ public class OrderController {
   OrderView pay(@PathVariable String id) {
     return orderService.payInstallment(id);
   }
+
+  @GetMapping("/manager/orders/reports/sales")
+  public SalesReportView getSalesReport(
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+    @RequestParam(required = false) String status,
+    @RequestParam(required = false) String paymentStatus) {
+  return orderService.generateSalesReport(startDate, endDate, status, paymentStatus);
+    }
 }
